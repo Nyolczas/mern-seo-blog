@@ -60,7 +60,7 @@ userSchema
     // create a temporary variable _password
     this._password = password;
     //generate salt
-    this.salt = this.maheSalt();
+    this.salt = this.makeSalt();
     // encrypt Password
     this.hashed_password = this.encryptPassword(password);
   })
