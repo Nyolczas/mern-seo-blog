@@ -54,4 +54,38 @@ const userSchema = new mongoose.Schema(
   { timestamp: true }
 );
 
+userSchema
+  .virtual('password')
+  .set(function (password) {
+    // create a temporary variable _password
+    this._password = password;
+    //generate salt
+    this.salt = this.maheSalt();
+    // encrypt Password
+    this.hashed_password = this.encryptPassword(password);
+  })
+  .get();
+
+userSchema.methods = {
+  authenticate: function (plainText) {
+    return this.encryptPassword(plainText) === this.hased_password;
+  },
+
+  encryptPassword: function (password) {
+    if (!password) return '';
+    try {
+      return crypto
+        .createHmac('sha1', this.salt)
+        .update(password)
+        .digest('hex');
+    } catch (e) {
+      return '';
+    }
+  },
+
+  makeSalt: function () {
+    return Math.round(new Date().valueOf() * Math.random()) + '';
+  },
+};
+
 module.exports = mongoose.model('User', userSchema);
